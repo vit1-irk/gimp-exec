@@ -40,15 +40,22 @@ void reparse_code(char* code) {
 
 int main(int argc, char** argv) {
 	if (argc < 2) {
-		printf("Usage: gimp-exec filename\n");
+		printf("Usage: gimp-exec filename [IP adress] [port]\n");
 		return 1;
 	}
 
 	char* filename=argv[1];
 
-	int sockfd, port=10008, n;
+	int sockfd, port, n;
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
+
+	char* host=(argc > 2) ? argv[2] : "127.0.0.1";
+	if (argc > 3) {
+		sscanf(argv[3], "%d", &port);
+	} else {
+		port=10008;
+	}
 
 	char* request=file_get_contents(filename);
 
@@ -75,7 +82,7 @@ int main(int argc, char** argv) {
 
 	serv_addr.sin_family=AF_INET;
 	serv_addr.sin_port = htons(port);
-	serv_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+	serv_addr.sin_addr.s_addr=inet_addr(host);
 
 	int connected=connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
 	if (connected < 0) {

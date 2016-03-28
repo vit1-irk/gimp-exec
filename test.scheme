@@ -1,0 +1,2 @@
+(+ 2 3)
+(gimp-message "test you")
