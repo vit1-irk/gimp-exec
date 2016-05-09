@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 	char magic='G';
 	char first=length/256;
 	char second=length % 256;
-	char buffer[512];
+	char buffer[5];
 
 	sockfd=socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 	}
 
 	bzero(&serv_addr, sizeof(serv_addr));
-	bzero(&buffer[0], 512);
+	bzero(&buffer[0], 5);
 
 	serv_addr.sin_family=AF_INET;
 	serv_addr.sin_port = htons(port);
@@ -97,9 +97,14 @@ int main(int argc, char** argv) {
 	recv(sockfd, &buffer, 4, 0);
 
 	int answer_length=buffer[2]*256+buffer[3];
-	recv(sockfd, &buffer, answer_length, 0);
-	printf("%s\n", buffer);
+	char* answer=(char*)malloc(answer_length+1);
+
+	recv(sockfd, answer, answer_length, 0);
 	close(sockfd);
+
+	answer[answer_length]='\0';
+	printf("%s\n", answer);
+	free(answer);
 
 	if (buffer[0] == magic && buffer[1]==0) {
 		printf("Success\n");
